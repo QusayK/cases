@@ -51,5 +51,8 @@ module.exports = db.sequelize.define(
             type: Sequelize.TINYINT,
             defaultVAlue: 1
         }
+    },
+    {
+        timestamps: false
     }
 )
