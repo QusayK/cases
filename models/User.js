@@ -1,9 +1,8 @@
 const Sequelize = require('sequelize')
 const db = require('../database/db.js')
+const jwt = require('jsonwebtoken')
 
-module.exports = db.sequelize.define(
-    'user',
-    {
+const User = db.sequelize.define( 'user', {
         id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
@@ -56,3 +55,11 @@ module.exports = db.sequelize.define(
         timestamps: false
     }
 )
+
+User.prototype.generateToken = (user) => {
+    return token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, { 
+        expiresIn: 1440 
+    })
+}
+
+module.exports = User
