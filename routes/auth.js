@@ -13,10 +13,10 @@ auth.post('/', async (req, res) => {
         }
     })
 
-    if (!user) return res.status(400).send("Invalid username or password!")
+    if (!user) return res.status(400).send("Invalid username or password.")
   
     const validPass = await bcrypt.compare(userData.password, user.password)
-    if (!validPass) return res.status(400).send("Invalid username or password!")
+    if (!validPass) return res.status(400).send("Invalid username or password.")
 
     const token =  user.generateToken(user)
 
