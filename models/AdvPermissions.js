@@ -1,14 +1,14 @@
 const Sequelize = require('sequelize')
 const db = require('../database/db')
 
-module.exports = db.sequelize.define('phone', {
+module.exports = db.sequelize.define('advocates_permissions', {
         id: {
             type: Sequelize.INTEGER,
             primaryKey: true
         },
-        phone_number: {
-            type: Sequelize.INTEGER,
-            primaryKey: true
+        edit_case: {
+            type: Sequelize.TINYINT,
+            defaultValue: 0
         }
     },
     {

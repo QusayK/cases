@@ -12,20 +12,17 @@ const User = db.sequelize.define( 'user', {
             type: Sequelize.STRING,
             unique: true
         },
-        fname: {
+        first_name: {
             type: Sequelize.STRING
         },
-        mname: {
+        last_name: {
             type: Sequelize.STRING
         },
-        lname: {
-            type: Sequelize.STRING
-        },
-        cname: {
+        company_name: {
             type: Sequelize.STRING
         },
         role: {
-            type: Sequelize.STRING
+            type: Sequelize.INTEGER
         },
         email: {
             type: Sequelize.STRING,
@@ -56,10 +53,8 @@ const User = db.sequelize.define( 'user', {
     }
 )
 
-User.prototype.generateToken = (user) => {
-    return token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, { 
-        expiresIn: 1440 
-    })
+User.prototype.generateToken = (user, permissions, manager_id, company) => {
+    return token = jwt.sign({ id: user.id, manager_id, role: user.role, permissions, company }, process.env.SECRET_KEY, { expiresIn: 1440 })
 }
 
 module.exports = User
