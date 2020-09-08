@@ -7,8 +7,14 @@ const managerAuth = require("../middlewares/managerAuth");
 const adminAddAdv_perm = require("../middlewares/adminAddAdv_perm");
 const advAuth = require("../middlewares/advAuth");
 const { validateId, validateUser } = require("../middlewares/validation");
+const addPhoneNums = require("../middlewares/addPhoneNums");
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
+const fs = require("fs");
+const { promisify } = require("util");
+const unlinkAsync = promisify(fs.unlink);
+const uploadFile = require("../middlewares/uploadFile");
+const upload = uploadFile("img");
 
 const adv = express.Router();
 
@@ -45,90 +51,116 @@ adv.get("/me", async (req, res) => {
   res.status(200).json(adv);
 });
 
-adv.post("/", [adminAddAdv_perm, validateUser], async (req, res) => {
-  let manager_id;
-  const company = req.user.company;
+adv.post(
+  "/",
+  [adminAddAdv_perm, validateUser, upload.single("img")],
+  async (req, res) => {
+    let manager_id, img;
+    const company = req.user.company;
 
-  if (req.user.role == 1) manager_id = req.user.id;
-  else if (req.user.role == 2) manager_id = req.user.manager_id;
+    if (req.file) img = req.file.path;
+    else img = default_img;
 
-  let advData = { ...req.body, role, company_name: company };
-  advData = _.pick(advData, [
-    "id",
-    "username",
-    "first_name",
-    "last_name",
-    "company_name",
-    "role",
-    "email",
-    "password",
-    "img",
-    "identity_number",
-    "address",
-  ]);
+    if (req.user.role == 1) manager_id = req.user.id;
+    else if (req.user.role == 2) manager_id = req.user.manager_id;
 
-  let adv = await User.findOne({
-    where: {
-      email: req.body.email,
-    },
-  });
+    let advData = { ...req.body, role, company_name: company, img };
+    advData = _.pick(advData, [
+      "id",
+      "username",
+      "first_name",
+      "last_name",
+      "company_name",
+      "role",
+      "email",
+      "password",
+      "img",
+      "identity_number",
+      "address",
+    ]);
 
-  if (adv) return res.status(400).send("Lawyer already registered.");
+    let adv = await User.findOne({
+      where: {
+        email: req.body.email,
+      },
+    });
 
-  const hash = await bcrypt.hash(advData.password, 10);
-  advData.password = hash;
+    if (adv) return res.status(400).send("Lawyer already registered.");
 
-  adv = await User.create(advData);
-  await Adv.create({
-    id: adv.id,
-    manager_id,
-  });
+    const hash = await bcrypt.hash(advData.password, 10);
+    advData.password = hash;
 
-  let perms = { ...req.body.permissions, id: adv.id };
-  perms = await AdvPermissions.create(perms);
+    adv = await User.create(advData);
+    await Adv.create({
+      id: adv.id,
+      manager_id,
+    });
 
-  const permissions = _.pick(perms, ["edit_case"]);
+    await addPhoneNums(req, res, adv);
 
-  const token = adv.generateToken(adv, manager_id, permissions, company);
+    let perms = { ...req.body.permissions, id: adv.id };
+    perms = await AdvPermissions.create(perms);
 
-  res
-    .status(201)
-    .header("x-auth", token)
-    .json(_.pick(adv, ["id", "username", "email", "role"]));
-});
+    const permissions = _.pick(perms, ["edit_case"]);
 
-adv.put("/:id", [advAuth, validateId, validateUser], async (req, res) => {
-  let adv = await User.findOne({
-    where: {
-      id: req.params.id,
-    },
-  });
+    const token = adv.generateToken(adv, manager_id, permissions, company);
 
-  if (!adv) return res.status(404).send("Lawyer not found.");
+    res
+      .status(201)
+      .header("x-auth", token)
+      .json(_.pick(adv, ["id", "username", "email", "role"]));
+  }
+);
 
-  adv.username = req.body.username;
-  adv.first_name = req.body.first_name;
-  adv.last_name = req.body.last_name;
-  adv.company_name = req.body.company_name;
-  adv.email = req.body.email;
-  adv.password = await bcrypt.hash(req.body.password, 10);
-  adv.img = req.body.img;
-  adv.identity_number = req.body.identity_number;
-  adv.address = req.body.address;
-  adv.status = req.body.status;
-  adv.save();
+adv.put(
+  "/:id",
+  [advAuth, validateId, validateUser, upload.single("img")],
+  async (req, res) => {
+    let adv = await User.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
 
-  res.status(200).json(_.pick(adv, ["id", "username", "role"]));
-});
+    if (!adv) return res.status(404).send("Lawyer not found.");
+
+    adv.username = req.body.username;
+    adv.first_name = req.body.first_name;
+    adv.last_name = req.body.last_name;
+    adv.company_name = req.body.company_name;
+    adv.email = req.body.email;
+    adv.password = await bcrypt.hash(req.body.password, 10);
+    if (req.file) {
+      if (adv.img !== default_img) {
+        await unlinkAsync(adv.img);
+        adv.img = req.file.path;
+      } else adv.img = req.file.path;
+    }
+    adv.identity_number = req.body.identity_number;
+    adv.address = req.body.address;
+    adv.status = req.body.status;
+    adv.save();
+
+    res.status(200).json(_.pick(adv, ["id", "username", "role"]));
+  }
+);
 
 adv.delete("/:id", [advAuth, validateId], async (req, res) => {
-  const adv = await User.destroy({
+  const adv = await User.findOne({
     where: {
       id: req.params.id,
     },
   });
 
   if (!adv) return res.status(404).send("Lawyer not found.");
+
+  if (adv.img !== default_img) await unlinkAsync(adv.img);
+
+  await User.destroy({
+    where: {
+      id: req.params.id,
+    },
+  });
 
   res.status(200).send("Lawyer deleted.");
 });

@@ -1,0 +1,135 @@
+<mat-horizontal-stepper linear #stepper>
+  <mat-step [stepControl]="basicInfo">
+    <form [formGroup]="basicInfo">
+      <ng-template matStepLabel>Basic Info</ng-template>
+      <mat-form-field>
+        <mat-label>Company name</mat-label>
+        <input
+          matInput
+          formControlName="company_name"
+          name="company_name"
+          required
+        />
+      </mat-form-field>
+      <br />
+      <mat-form-field>
+        <mat-label>Address</mat-label>
+        <input matInput formControlName="address" name="address" required />
+      </mat-form-field>
+      <br />
+      <mat-form-field>
+        <mat-label>First name</mat-label>
+        <input
+          matInput
+          formControlName="first_name"
+          name="first_name"
+          required
+        />
+      </mat-form-field>
+      <br />
+      <mat-form-field>
+        <mat-label>Last name</mat-label>
+        <input matInput formControlName="last_name" name="last_name" required />
+      </mat-form-field>
+      <div>
+        <button mat-button matStepperNext mat-raised-button color="primary">
+          Next
+        </button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="contactInfo">
+    <form [formGroup]="contactInfo">
+      <ng-template matStepLabel>Contact Info</ng-template>
+      <mat-form-field>
+        <mat-label>E-mail</mat-label>
+        <input
+          type="email"
+          matInput
+          formControlName="email"
+          name="email"
+          required
+        />
+      </mat-form-field>
+      <br />
+      <mat-form-field>
+        <mat-label>Phone number</mat-label>
+        <input
+          matInput
+          formControlName="phone_number"
+          name="phone_number"
+          required
+        />
+      </mat-form-field>
+      <br />
+      <mat-form-field>
+        <mat-label>Identity number</mat-label>
+        <input
+          matInput
+          formControlName="identity_number"
+          name="identity_number"
+          required
+        />
+      </mat-form-field>
+      <div>
+        <button
+          mat-button
+          matStepperPrevious
+          mat-stroked-button
+          color="primary"
+        >
+          Back
+        </button>
+        <button mat-button matStepperNext mat-raised-button color="primary">
+          Next
+        </button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="loginInfo">
+    <form [formGroup]="loginInfo">
+      <ng-template matStepLabel>Login Info</ng-template>
+      <mat-form-field>
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" name="username" required />
+      </mat-form-field>
+      <br />
+      <mat-form-field>
+        <mat-label>Password</mat-label>
+        <input
+          type="password"
+          matInput
+          formControlName="password"
+          name="password"
+          required
+        />
+      </mat-form-field>
+      <div>
+        <button
+          mat-button
+          matStepperPrevious
+          mat-stroked-button
+          color="primary"
+        >
+          Back
+        </button>
+        <button
+          mat-button
+          mat-raised-button
+          color="primary"
+          (click)="stepper.reset()"
+        >
+          Reset
+        </button>
+        <button
+          mat-button
+          mat-raised-button
+          color="primary"
+          (click)="onSubmit()"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
+  </mat-step>
+</mat-horizontal-stepper>

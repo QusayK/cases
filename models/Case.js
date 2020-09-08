@@ -6,9 +6,6 @@ module.exports = db.sequelize.define("case", {
     type: Sequelize.INTEGER,
     primaryKey: true,
   },
-  adv_id: {
-    type: Sequelize.INTEGER,
-  },
   case_type: {
     type: Sequelize.INTEGER,
   },

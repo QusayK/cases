@@ -36,10 +36,7 @@ _case.get("/all", managerAuth, async (req, res) => {
 
 _case.post("/", validateCase, async (req, res) => {
   const { id, manager_id, role } = req.user;
-  let manager;
-
-  if (role === 1) manager = id;
-  else manager = manager_id;
+  const manager = role === 1 ? id : manager_id;
 
   const caseData = { ...req.body, who_added_it: id, manager_id: manager };
 
@@ -49,8 +46,8 @@ _case.post("/", validateCase, async (req, res) => {
     .status(201)
     .json(
       _.pick(_case, [
-        "add_adv",
-        "edit_adv",
+        "id",
+        "case_type",
         "desc",
         "cost",
         "cost_type",
@@ -67,7 +64,6 @@ _case.post("/", validateCase, async (req, res) => {
 _case.put("/:id", [validateId, caseAuth, validateCase], async (req, res) => {
   const _case = req._case;
 
-  _case.adv_id = req.body.adv_id;
   _case.case_type = req.body.case_type;
   _case.desc = req.body.desc;
   _case.cost = req.body.cost;

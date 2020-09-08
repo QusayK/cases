@@ -1,0 +1,40 @@
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+
+  background-color: #eeeeee;
+
+  padding: 4rem 5rem;
+
+  .text {
+    display: grid;
+    place-content: center;
+
+    h1 {
+      font-family: "Krona One", sans-serif;
+      font-size: 2.5rem;
+
+      color: #222831;
+    }
+
+    h3 {
+      font-family: "Nunito", sans-serif;
+      font-size: 1.5rem;
+
+      color: #393e46;
+
+      margin-top: 3rem;
+    }
+  }
+
+  .img {
+    display: grid;
+    place-items: center;
+
+    object-fit: cover;
+
+    img {
+      width: 60%;
+    }
+  }
+}

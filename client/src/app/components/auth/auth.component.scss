@@ -1,0 +1,34 @@
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+
+  background-color: #eeeeee;
+
+  padding: 3rem 5rem;
+
+  .img-container {
+    width: 100%;
+
+    .img {
+      width: 70%;
+
+      margin-left: auto;
+
+      object-fit: cover;
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 876px) {
+  .img-container {
+    margin-top: 10px;
+
+    .img {
+      margin: 0 auto;
+    }
+  }
+}
